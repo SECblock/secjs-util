@@ -1,5 +1,5 @@
 
-var time= require('./index.js');
+var time= require('./index.js');//测试
 
 time.UnixTime();
 
