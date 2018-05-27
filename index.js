@@ -704,34 +704,32 @@
 //   }
 // }
 
-function UnixTime () {
+function UnixTime() {
 
-  try {
-    var date = new Date() 
-    //s=null; date = s.length;//还原此行会报错
-    var CurrentUnixTime = date.getTime() // 获取时间对象并转成Unix时间戳
-} catch (e) {
-    console.log('ERROR：' + e);
-} finally {
-    console.log(CurrentUnixTime);
+    try {
+        let date = new Date()
+        //s=null; date = s.length;//还原此行会报错
+        var CurrentUnixTime = date.getTime() // 获取时间对象并转成Unix时间戳
+    } catch (e) {
+        console.log('ERROR：' + e)
+    } finally {
+        console.log(CurrentUnixTime)
+    }
 }
-}
-//module.exports = UnixTime;
-exports.UnixTime= UnixTime;
+exports.UnixTime = UnixTime
 
-function DateTime () {
+function DateTime() {
 
-  try {
-    
-    var date = new Date() 
-    var CurrentUnixTime = date.getTime();
-    //s=null; date = s.length;//还原此行会报错
-    var DateTime = new Date(CurrentUnixTime).toUTCString(); // Unix时间戳转为JS标准时间
-} catch (e) {
-    console.log('ERROR：' + e);
-} finally {
-    console.log(DateTime)
+    try {
+
+        let date = new Date()
+        var CurrentUnixTime = date.getTime()
+        //s=null; date = s.length;//还原此行会报错
+        var DateTime = new Date(CurrentUnixTime).toUTCString() // Unix时间戳转为JS标准时间
+    } catch (e) {
+        console.log('ERROR：' + e)
+    } finally {
+        console.log(DateTime)
+    }
 }
-}
-//module.exports = UnixTime;
-exports.DateTime= DateTime;
+exports.DateTime = DateTime

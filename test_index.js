@@ -1,6 +1,5 @@
+let time= require('./index.js') //测试
 
-var time= require('./index.js');//测试
+time.UnixTime()
 
-time.UnixTime();
-
-time.DateTime();
+time.DateTime()
