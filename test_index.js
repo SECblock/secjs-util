@@ -1,5 +1,5 @@
-let time= require('./index.js') //测试
+const SecUtil = require('./index.js')
+const Utils = new SecUtil()
 
-time.UnixTime()
-
-time.DateTime()
+Utils.UnixTime()
+Utils.DateTime()

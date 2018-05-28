@@ -704,32 +704,28 @@
 //   }
 // }
 
-function UnixTime() {
+class SecUtil {
+  constructor () {
+    this.date = ''
+    this.CurrentUnixTime = ''
+    this.CurrentDateTime = ''
+  }
+  UnixTime () {
+    let date = new Date()
+    this.CurrentUnixTime = date.getTime()
+    let CurrentUnixTime = this.CurrentUnixTime
 
-    try {
-        let date = new Date()
-        //s=null; date = s.length;//还原此行会报错
-        var CurrentUnixTime = date.getTime() // 获取时间对象并转成Unix时间戳
-    } catch (e) {
-        console.log('ERROR：' + e)
-    } finally {
-        console.log(CurrentUnixTime)
-    }
+    return console.log(CurrentUnixTime) // return CurrentUnixTime
+  }
+  DateTime () {
+    let date = new Date()
+    this.CurrentUnixTime = date.getTime()
+    let CurrentUnixTime = this.CurrentUnixTime
+    this.CurrentDateTime = new Date(CurrentUnixTime).toUTCString()
+    let CurrentDateTime = this.CurrentDateTime
+
+    return console.log(CurrentDateTime) // return CurrentDateTime
+  }
 }
-exports.UnixTime = UnixTime
 
-function DateTime() {
-
-    try {
-
-        let date = new Date()
-        var CurrentUnixTime = date.getTime()
-        //s=null; date = s.length;//还原此行会报错
-        var DateTime = new Date(CurrentUnixTime).toUTCString() // Unix时间戳转为JS标准时间
-    } catch (e) {
-        console.log('ERROR：' + e)
-    } finally {
-        console.log(DateTime)
-    }
-}
-exports.DateTime = DateTime
+module.exports = SecUtil
