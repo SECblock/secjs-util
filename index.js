@@ -1,4 +1,4 @@
-class SecUtil {
+class SecUtils {
   constructor () {
     this.date = ''
     this.CurrentUnixTime = ''
@@ -30,7 +30,7 @@ class SecUtil {
   }
 }
 
-module.exports = SecUtil
+module.exports = SecUtils
 
 // class SecUtil {
 //   constructor () {
