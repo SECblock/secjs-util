@@ -1,5 +1,8 @@
 const SecUtil = require('./index.js')
 const Utils = new SecUtil()
 
-Utils.UnixTime()
-Utils.DateTime()
+let a = Utils.UnixTime()
+console.log(a)
+
+let b = Utils.DateTime()
+console.log(b)
