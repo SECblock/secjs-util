@@ -15,7 +15,7 @@ class SecUtils {
     return this.CurrentUnixTime
   }
   /**
-   * @param  {text} a -test parameter a
+   * @param  {text}
    */
   DateTime () {
     try {
@@ -31,29 +31,3 @@ class SecUtils {
 }
 
 module.exports = SecUtils
-
-// class SecUtil {
-//   constructor () {
-//     this.date = ''
-//     this.CurrentUnixTime = ''
-//     this.CurrentDateTime = ''
-//   }
-//   UnixTime () {
-//     let date = new Date()
-//     this.CurrentUnixTime = date.getTime()
-//     let CurrentUnixTime = this.CurrentUnixTime
-
-//     return CurrentUnixTime
-//   }
-//   DateTime () {
-//     let date = new Date()
-//     this.CurrentUnixTime = date.getTime()
-//     let CurrentUnixTime = this.CurrentUnixTime
-//     this.CurrentDateTime = new Date(CurrentUnixTime).toUTCString()
-//     let CurrentDateTime = this.CurrentDateTime
-
-//     return CurrentDateTime
-//   }
-// }
-
-// module.exports = SecUtil

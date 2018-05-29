@@ -1,8 +1,8 @@
-const SecUtils = require('../index.js')
-const Utils = new SecUtils()
+const SecUtils = require('../src/index')
+const util = new SecUtils()
 
-let a = Utils.UnixTime()
-let b = Utils.DateTime()
+let a = util.UnixTime()
+let b = util.DateTime()
 console.log('Unix timestamp is ' + a)
 console.log('GMT standard time is ' + b)
 

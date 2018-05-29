@@ -1,31 +1,62 @@
 <a name="SecUtils"></a>
+
 * * *
 ## SecUtils
 [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard) 
 ![Travis](https://img.shields.io/travis/USER/REPO.svg)
 
+**Kind**: global class
+* [SecUtils](#SecUtils)
+    * [.UnixTime()](#UnixTime) ⇒ <code>Array.&lt;Buffer&gt;</code>
+    * [.DateTime()](#DateTime) ⇒ <code>Array.&lt;Buffer&gt;</code>
+    * 
+    * 
+    * 
+
+   
 **Definition**: A collection of utility functions for secblock. It can be used in node.js or can be in the browser with browserify. -->
+
 **Install**
-```sh
+```js
 npm install SecUtils --save (t.b.d)
 ```
+
 **Usage**
-```sh
+```js
 class SecUtils {
     ...
     func1()
+    func2()
     ...
 }
-
-const Utils = new SecUtils() // define a smiple constant
-SecUtils.func1()            // callback
+const util = new SecUtils() // define a smiple constant
+util.func1()            // callback
 ```
+
 * * *
-### UnixTime()
-A utility function of getting a Unix timestamp from using for the UnixTime(), which is integrated of an error-showing process.
-### DateTime()
-A utility function of getting a standard GMT time from using for the DateTime(), which is integrated of an error-showing process.
-### 
+<a name="UnixTime"></a>
+
+### UnixTime
+A utility function of getting a Unix timestamp from using for the UnixTime(), which is integrated with an error handling process.
+
+**Example**
+```js
+const MerkleTree = require('../src/index')
+const util = new SecUtils()
+util.UnixTime()
+```
+
+* * *
+<a name="DateTime"></a>
+
+### DateTime
+A utility function of getting a standard GMT time from using for the DateTime(), which is integrated with an error handling process.
+
+```js
+const MerkleTree = require('../src/index')
+const util = new SecUtils()
+util.DateTime()
+```
 
 ### LICENSE
 MPL-2.0
