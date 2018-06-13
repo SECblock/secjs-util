@@ -46,18 +46,6 @@ class SecUtils {
     this.unixtime = date.getTime()
     return this.unixtime
   }
-  // DateTime () {
-  //   try {
-  //     let date = new Date()
-  //     this.CurrentUnixTime = date.getTime()
-  //     let CurrentUnixTime = this.CurrentUnixTime
-  //     this.CurrentDateTime = new Date(CurrentUnixTime).toUTCString()
-  //   } catch (e) {
-  //     console.log('ERROR：' + e)
-  //   }
-  //   return this.CurrentDateTime
-  // }
-
   // CryptoSignature (msgHash, v, r, s) {
   //   const signature = Buffer.concat([exports.setLength(r, 32), exports.setLength(s, 32)], 64)
   //   const recovery = v - 27
