@@ -48,7 +48,7 @@ util.UnixTime()
 * * *
 <a name="getDatetime"></a>
 
-### DateTime
+### getDatetime
 A utility function of converting a standard GMT time to a Unix timestamp.
 
 **Example**
@@ -60,7 +60,7 @@ util.getDatetime()
 * * *
 <a name="getUnixtime"></a>
 
-### UnixTime
+### getUnixtime
 A utility function of converting a Unix timestamp to a standard GMT time.
 
 **Example**
