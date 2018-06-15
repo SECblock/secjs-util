@@ -13,9 +13,7 @@
     "prepublishOnly": "npm run lint && npm run build:dist && npm run test",
     "test": "npm run test:node && npm run test:browser",
     "test:browser": "npm run build:dist && karma start karma.conf.js",
-    "test:node": "npm run build:dist && istanbul test mocha -- --reporter spec",
-    "build:dist": "babel src/index.js --source-root ./ -d ./dist",
-    "build:docs": "documentation build src/index.js --github --sort-order='alpha' -f md > ./docs/index.md"
+    "test:node": "npm run build:dist && istanbul test mocha -- --reporter spec"
   },
   "repository": {
     "type": "git",
