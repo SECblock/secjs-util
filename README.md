@@ -17,7 +17,7 @@ A collection of utility functions for secblock. It can be used in node.js or can
 
 **Install**
 ```js
-npm install SecUtils --save (t.b.d)
+npm install @sec-block/secjs-util --save (t.b.d)
 ```
 
 **Usage**
@@ -40,7 +40,7 @@ A utility function of getting a Unix timestamp from using for the UnixTime(), wh
 
 **Example**
 ```js
-const MerkleTree = require('../src/index')
+const SecUtils = require('../src/index')
 const util = new SecUtils()
 util.UnixTime()
 ```
@@ -53,7 +53,7 @@ A utility function of converting a standard GMT time to a Unix timestamp.
 
 **Example**
 ```js
-const MerkleTree = require('../src/index')
+const SecUtils = require('../src/index')
 const util = new SecUtils()
 util.getDatetime()
 ```
@@ -65,7 +65,7 @@ A utility function of converting a Unix timestamp to a standard GMT time.
 
 **Example**
 ```js
-const MerkleTree = require('../src/index')
+const SecUtils = require('../src/index')
 const util = new SecUtils()
 util.getUnixtime()
 ```
