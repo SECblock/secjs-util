@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "standard",
     "prepublishOnly": "npm run lint && npm run test",
-    "test": "npm run test:node && npm run test:browser"
+    "test": "npm run test"
   },
   "repository": {
     "type": "git",
