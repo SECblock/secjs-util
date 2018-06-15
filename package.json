@@ -1,5 +1,5 @@
 {
-  "name": "sec-util",
+  "name": "@sec-block/sec-util",
   "version": "1.0.1",
   "description": "a collection of utility functions for SECBlock",
   "main": "src/index.js",
@@ -7,13 +7,9 @@
     "src"
   ],
   "scripts": {
-    "coverage": "npm run build:dist && istanbul cover _mocha",
-    "coveralls": "npm run coverage && coveralls <coverage/lcov.info",
     "lint": "standard",
     "prepublishOnly": "npm run lint && npm run build:dist && npm run test",
-    "test": "npm run test:node && npm run test:browser",
-    "test:browser": "npm run build:dist && karma start karma.conf.js",
-    "test:node": "npm run build:dist && istanbul test mocha -- --reporter spec"
+    "test": "npm run test:node && npm run test:browser"
   },
   "repository": {
     "type": "git",
