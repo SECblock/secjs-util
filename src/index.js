@@ -28,7 +28,7 @@ class SecUtils {
     this.generatePrivateKey()
   }
 
-  currentUnixtime () {
+  currentUnixTimeInMillisecond () {
     try {
       let date = new Date()
       this.CurrentUnixtime = date.getTime()
@@ -39,7 +39,7 @@ class SecUtils {
   }
 
   currentUnixTimeInSecond () {
-    this.currentUnixTimeInSecond = Math.round(this.currentUnixtime() / 1000)
+    this.currentUnixTimeInSecond = Math.round(this.currentUnixTimeInMillisecond() / 1000)
     return this.currentUnixTimeInSecond
   }
   /**
