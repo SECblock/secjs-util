@@ -6,7 +6,9 @@ const crypto = require('crypto')
 const EC = require('elliptic').ec
 const RIPEMD160 = require('ripemd160')
 const bs58 = require('bs58')
+const dgram = require('dgram')
 const ec = new EC('secp256k1')
+const ntpPort = '123'
 
 exports.BN = BN
 exports.secp256k1 = secp256k1
@@ -16,6 +18,7 @@ class SecUtils {
   constructor () {
     this.date = ''
     this.CurrentUnixtime = ''
+    this.currentUnixTimeInSecond = ''
     this.unixtime = ''
     this.datetime = ''
     this.privKey = ''
@@ -24,6 +27,7 @@ class SecUtils {
     this.secAddress = ''
     this.generatePrivateKey()
   }
+
   currentUnixtime () {
     try {
       let date = new Date()
@@ -32,6 +36,11 @@ class SecUtils {
       console.log('ERROR：' + e)
     }
     return this.CurrentUnixtime
+  }
+
+  currentUnixTimeInSecond () {
+    this.currentUnixTimeInSecond = Math.round(this.currentUnixtime() / 1000)
+    return this.currentUnixTimeInSecond
   }
   /**
    * @param  {} anyUnixtime = unix time in number
@@ -57,6 +66,51 @@ class SecUtils {
     this.unixtime = date.getTime()
     return this.unixtime
   }
+
+  /**
+  //  * get unix time from time server
+  //  * @return {Promise}
+  //  */
+  asyncGetUTCTimeFromServer () {
+    return new Promise((resolve, reject) => {
+      let ntpClient = dgram.createSocket('udp4')
+      let ntpData = Buffer.alloc(48)
+      ntpData[0] = 0x1B
+      ntpClient.on('error', (err) => {
+        if (err) {
+          ntpClient.close()
+          reject(err)
+        }
+      })
+
+      ntpClient.send(ntpData, ntpPort, this.ntpTimeServerAddress, (err) => {
+        if (err) {
+          ntpClient.close()
+          reject(err)
+        }
+      })
+
+      ntpClient.once('message', (msg) => {
+        let offsetTransmitTime = 40
+        let intpart = 0
+        let fractpart = 0
+        ntpClient.close()
+        // Get the seconds part
+        for (var i = 0; i <= 3; i++) {
+          intpart = 256 * intpart + msg[offsetTransmitTime + i]
+        }
+        // Get the seconds fraction
+        for (i = 4; i <= 7; i++) {
+          fractpart = 256 * fractpart + msg[offsetTransmitTime + i]
+        }
+        let milliseconds = (intpart * 1000 + (fractpart * 1000) / 0x100000000)
+        var date = new Date('Jan 01 1900 GMT')
+        date.setUTCMilliseconds(date.getUTCMilliseconds() + milliseconds)
+        resolve(parseInt(date.getTime() / 1000))
+      })
+    })
+  }
+
   // CryptoSignature (msgHash, v, r, s) {
   //   const signature = Buffer.concat([exports.setLength(r, 32), exports.setLength(s, 32)], 64)
   //   const recovery = v - 27
