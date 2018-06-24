@@ -57,7 +57,9 @@ A utility function of converting a standard GMT time to a Unix timestamp.
 **Example**
 ```js
 const SecUtils = require('../src/index')
-const util = new SecUtils()
+const util = new SecUtils({
+    timeServer: 'DE'
+})
 util.getDatetime()
 ```
 * * *
@@ -69,9 +71,48 @@ A utility function of converting a Unix timestamp to a standard GMT time.
 **Example**
 ```js
 const SecUtils = require('../src/index')
-const util = new SecUtils()
+const util = new SecUtils({
+    timeServer: 'DE'
+})
 util.getUnixtime()
 ```
+
+* * *
+<a name="asyncGetUTCTimeFromServer"></a>
+
+### asyncGetUTCTimeFromServer
+A utility function of get utc time from ntp server.
+
+**Example**
+```js
+const SecUtils = require('../src/index')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.asyncGetUTCTimeFromeServer().then(callback).catch(err)
+```
+
+* * *
+<a name="refreshTimeDifference"></a>
+
+### refreshTimeDifference
+A utility function to refresh the time difference between local host and ntp server.
+
+**Example**
+```js
+const SecUtils = require('../src/index')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.refreshTimeDifference( (err, timeDiff) => {
+    if (err) {
+        console.log(err)
+    }
+    console.log(timeDiff)
+})
+```
+
+
 <a name="secUtil+hasha256"></a>
 
 ### hasha256(data)
