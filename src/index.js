@@ -7,6 +7,7 @@ const EC = require('elliptic').ec
 const RIPEMD160 = require('ripemd160')
 const bs58 = require('bs58')
 const dgram = require('dgram')
+const fs = require('fs')
 const ec = new EC('secp256k1')
 const ntpPort = '123'
 
@@ -15,16 +16,32 @@ exports.secp256k1 = secp256k1
 exports.rlp = rlp
 
 class SecUtils {
-  constructor () {
+  constructor (config) {
     this.date = ''
     this.CurrentUnixtime = ''
     this.currentUnixTimeInSecond = ''
     this.unixtime = ''
     this.datetime = ''
+    this.timeDiff = 0 // time difference between server and local host
     this.privKey = ''
     this.publicKey = ''
     this.secWifAddress = ''
     this.secAddress = ''
+    this.filePath = process.cwd() + 'timeDiff.txt'
+    switch (config.timeServer) {
+      case 'USA':
+        this.ntpTimeServerAddress = 'us.pool.ntp.org'
+        break
+      case 'DE':
+        this.ntpTimeServerAddress = 'de.pool.ntp.org'
+        break
+      case 'ZH':
+        this.ntpTimeServerAddress = 'cn.pool.ntp.org'
+        break
+      default:
+        this.ntpTimeServerAddress = 'de.pool.ntp.org'
+        break
+    }
     this.generatePrivateKey()
   }
 
@@ -38,10 +55,6 @@ class SecUtils {
     return this.CurrentUnixtime
   }
 
-  currentUnixTimeInSecond () {
-    this.currentUnixTimeInSecond = Math.round(this.currentUnixTimeInMillisecond() / 1000)
-    return this.currentUnixTimeInSecond
-  }
   /**
    * @param  {} anyUnixtime = unix time in number
    * @param  {} datetime=convert to date time
@@ -57,6 +70,12 @@ class SecUtils {
     this.datetime = Y + M + D + h + m + s
     return this.datetime
   }
+
+  currentUnixTimeSecond () {
+    this.currentUnixTimeInSecond = Math.round(this.currentUnixTimeInMillisecond() / 1000)
+    return this.currentUnixTimeInSecond
+  }
+
   /**
    * @param  {} anyDate= date time in String,'YYYY MM DD HH:MM:SS:MS'
    * @param  {} this.unixtime=convert to unix time
@@ -108,6 +127,39 @@ class SecUtils {
         date.setUTCMilliseconds(date.getUTCMilliseconds() + milliseconds)
         resolve(parseInt(date.getTime() / 1000))
       })
+    })
+  }
+
+  /**
+   * get the time difference
+   */
+  async refreshTimeDifference (callback) {
+    let localHostTime = this.currentUnixTimeSecond()
+    let serverTime = 0
+    let tryOut = 0
+    try {
+      serverTime = await this.asyncGetUTCTimeFromServer()
+      this.timeDiff = localHostTime - serverTime
+      this._writeTimeDiffToFile()
+      callback(null, this.timeDiff)
+    } catch (err) {
+      tryOut = tryOut + 1
+      if (tryOut === this.ntpTryOut) {
+        callback(serverTime, err)
+        throw Error(err)
+      }
+      serverTime = await this.asyncGetUTCTimeFromServer()
+      this.timeDiff = localHostTime - serverTime
+      this._writeTimeDiffToFile()
+      callback(null, this.timeDiff)
+    }
+  }
+
+  _writeTimeDiffToFile () {
+    fs.writeFile(this.filePath, this.timeDiff, (err) => {
+      if (err) {
+        console.log(err)
+      }
     })
   }
 
