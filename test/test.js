@@ -1,7 +1,9 @@
 const SecUtils = require('../src/index')
-const util = new SecUtils()
+const util = new SecUtils({
+  timeServer: 'DE'
+})
 
-let a = util.currentUnixtime()
+let a = util.currentUnixTimeInMillisecond()
 console.log('current Unix time is ' + a)
 // let b = util.DateTime()
 // console.log('GMT standard time is ' + b)
@@ -17,3 +19,10 @@ console.log('convert to datetime ' + c)
 let d = '2014-04-23 18:55:49:123' // any date time
 let e = util.getUnixtime(d)
 console.log('convert to unixtime ' + e)
+
+util.refreshTimeDifference((err, timeDiff) => {
+  if (err) {
+    console.log(err)
+  }
+  console.log(timeDiff)
+})
