@@ -16,7 +16,7 @@ exports.secp256k1 = secp256k1
 exports.rlp = rlp
 
 class SecUtils {
-  constructor (config) {
+  constructor (config = {}) {
     this.date = ''
     this.CurrentUnixtime = ''
     this.currentUnixTimeInSecond = ''
