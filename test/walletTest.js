@@ -1,5 +1,7 @@
 const SecUtil = require('../src/index')
-let TestWallet = new SecUtil()
+let TestWallet = new SecUtil({
+  timeServer: 'DE'
+})
 
 console.log(`PrivateKey: ${TestWallet.getPrivateKey()}`)
 console.log(`secWifFinal: ${TestWallet.getsecWifFinal()}`)
@@ -8,7 +10,9 @@ console.log(`Address: ${TestWallet.getAddress()}`)
 
 for (let i = 0; i < 10; i++) {
   console.log(`\n\n########################## Time: ${i} ##########################\n`)
-  let TestWallet = new SecUtil()
+  let TestWallet = new SecUtil({
+    timeServer: 'DE'
+  })
   console.log(`PrivateKey: ${TestWallet.getPrivateKey()} Length: ${TestWallet.getPrivateKey().length}`)
   console.log(`secWifFinal: ${TestWallet.getsecWifFinal()} Length: ${TestWallet.getsecWifFinal().length}`)
   console.log(`PublicKey: ${TestWallet.getPublicKey()} Length: ${TestWallet.getPublicKey().length}`)
