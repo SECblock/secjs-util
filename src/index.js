@@ -1,5 +1,9 @@
 'strict mode'
 const secp256k1 = require('secp256k1')
+const createKeccakHash = require('keccak')
+const stripHexPrefix = require('strip-hex-prefix')
+const assert = require('assert')
+const Buffer = require('safe-buffer').Buffer
 const rlp = require('rlp')
 const BN = require('bn.js')
 const crypto = require('crypto')
@@ -11,12 +15,66 @@ const fs = require('fs')
 const ec = new EC('secp256k1')
 const ntpPort = '123'
 
-exports.BN = BN
-exports.secp256k1 = secp256k1
-exports.rlp = rlp
-
 class SecUtils {
-  constructor (config = {}) {
+  constructor (config = { timeServer: 'DE' }) {
+    /**
+     * the max integer that this VM can handle (a ```BN```)
+     * @var {BN} MAX_INTEGER
+     */
+    this.MAX_INTEGER = new BN('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+
+    /**
+     * 2^256 (a ```BN```)
+     * @var {BN} TWO_POW256
+     */
+    this.TWO_POW256 = new BN('10000000000000000000000000000000000000000000000000000000000000000', 16)
+
+    /**
+     * Keccak-256 hash of null (a ```String```)
+     * @var {String} KECCAK256_NULL_S
+     */
+    this.KECCAK256_NULL_S = 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
+    this.SHA3_NULL_S = this.KECCAK256_NULL_S
+
+    /**
+     * Keccak-256 hash of null (a ```Buffer```)
+     * @var {Buffer} KECCAK256_NULL
+     */
+    this.KECCAK256_NULL = Buffer.from(this.KECCAK256_NULL_S, 'hex')
+    this.SHA3_NULL = this.KECCAK256_NULL
+
+    /**
+     * Keccak-256 of an RLP of an empty array (a ```String```)
+     * @var {String} KECCAK256_RLP_ARRAY_S
+     */
+    this.KECCAK256_RLP_ARRAY_S = '1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'
+    this.SHA3_RLP_ARRAY_S = this.KECCAK256_RLP_ARRAY_S
+
+    /**
+     * Keccak-256 of an RLP of an empty array (a ```Buffer```)
+     * @var {Buffer} KECCAK256_RLP_ARRAY
+     */
+    this.KECCAK256_RLP_ARRAY = Buffer.from(this.KECCAK256_RLP_ARRAY_S, 'hex')
+    this.SHA3_RLP_ARRAY = this.KECCAK256_RLP_ARRAY
+
+    /**
+     * Keccak-256 hash of the RLP of null  (a ```String```)
+     * @var {String} KECCAK256_RLP_S
+     */
+    this.KECCAK256_RLP_S = '56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'
+    this.SHA3_RLP_S = this.KECCAK256_RLP_S
+
+    /**
+     * Keccak-256 hash of the RLP of null (a ```Buffer```)
+     * @var {Buffer} KECCAK256_RLP
+     */
+    this.KECCAK256_RLP = Buffer.from(this.KECCAK256_RLP_S, 'hex')
+    this.SHA3_RLP = this.KECCAK256_RLP
+
+    this.BN = BN
+    this.secp256k1 = secp256k1
+    this.rlp = rlp
+
     this.date = ''
     this.CurrentUnixtime = ''
     this.currentUnixTimeInSecond = ''
@@ -115,15 +173,15 @@ class SecUtils {
         let fractpart = 0
         ntpClient.close()
         // Get the seconds part
-        for (var i = 0; i <= 3; i++) {
+        for (let i = 0; i <= 3; i++) {
           intpart = 256 * intpart + msg[offsetTransmitTime + i]
         }
         // Get the seconds fraction
-        for (i = 4; i <= 7; i++) {
+        for (let i = 4; i <= 7; i++) {
           fractpart = 256 * fractpart + msg[offsetTransmitTime + i]
         }
         let milliseconds = (intpart * 1000 + (fractpart * 1000) / 0x100000000)
-        var date = new Date('Jan 01 1900 GMT')
+        let date = new Date('Jan 01 1900 GMT')
         date.setUTCMilliseconds(date.getUTCMilliseconds() + milliseconds)
         resolve(parseInt(date.getTime() / 1000))
       })
@@ -164,7 +222,7 @@ class SecUtils {
   }
 
   // CryptoSignature (msgHash, v, r, s) {
-  //   const signature = Buffer.concat([exports.setLength(r, 32), exports.setLength(s, 32)], 64)
+  //   const signature = Buffer.concat([this.setLength(r, 32), this.setLength(s, 32)], 64)
   //   const recovery = v - 27
   //   if (recovery !== 0 && recovery !== 1) {
   //     throw new Error('Invalid signature v value')
@@ -271,6 +329,240 @@ class SecUtils {
 
   getAddress () {
     return this.secAddress
+  }
+
+  /**
+   * sec-block supporting utils
+   */
+
+  /**
+   * Defines properties on a `Object`. It make the assumption that underlying data is binary.
+   * @param {Object} self the `Object` to define properties on
+   * @param {Array} fields an array fields to define. Fields can contain:
+   * * `name` - the name of the properties
+   * * `length` - the number of bytes the field can have
+   * * `allowLess` - if the field can be less than the length
+   * * `allowEmpty`
+   * @param {*} data data to be validated against the definitions
+   */
+  defineProperties (self, fields, data) {
+    self.raw = []
+    self._fields = []
+
+    // attach the `toJSON`
+    self.toJSON = function (label) {
+      if (label) {
+        const obj = {}
+        self._fields.forEach((field) => {
+          obj[field] = '0x' + self[field].toString('hex')
+        })
+        return obj
+      }
+      return this.baToJSON(this.raw)
+    }
+
+    self.serialize = function serialize () {
+      return rlp.encode(self.raw)
+    }
+
+    fields.forEach((field, i) => {
+      self._fields.push(field.name)
+      function getter () {
+        return self.raw[i]
+      }
+      function setter (v) {
+        v = this.toBuffer(v)
+
+        if (v.toString('hex') === '00' && !field.allowZero) {
+          v = Buffer.allocUnsafe(0)
+        }
+
+        if (field.allowLess && field.length) {
+          v = this.stripZeros(v)
+          assert(field.length >= v.length, 'The field ' + field.name + ' must not have more ' + field.length + ' bytes')
+        } else if (!(field.allowZero && v.length === 0) && field.length) {
+          assert(field.length === v.length, 'The field ' + field.name + ' must have byte length of ' + field.length)
+        }
+
+        self.raw[i] = v
+      }
+
+      Object.defineProperty(self, field.name, {
+        enumerable: true,
+        configurable: true,
+        get: getter,
+        set: setter
+      })
+
+      if (field.default) {
+        self[field.name] = field.default
+      }
+
+      // attach alias
+      if (field.alias) {
+        Object.defineProperty(self, field.alias, {
+          enumerable: false,
+          configurable: true,
+          set: setter,
+          get: getter
+        })
+      }
+    })
+
+    // if the constuctor is passed data
+    if (data) {
+      if (typeof data === 'string') {
+        data = Buffer.from(stripHexPrefix(data), 'hex')
+      }
+
+      if (Buffer.isBuffer(data)) {
+        data = rlp.decode(data)
+      }
+
+      if (Array.isArray(data)) {
+        if (data.length > self._fields.length) {
+          throw (new Error('wrong number of fields in data'))
+        }
+
+        // make sure all the items are buffers
+        data.forEach((d, i) => {
+          self[self._fields[i]] = this.toBuffer(d)
+        })
+      } else if (typeof data === 'object') {
+        const keys = Object.keys(data)
+        fields.forEach((field) => {
+          if (keys.indexOf(field.name) !== -1) self[field.name] = data[field.name]
+          if (keys.indexOf(field.alias) !== -1) self[field.alias] = data[field.alias]
+        })
+      } else {
+        throw new Error('invalid data')
+      }
+    }
+  }
+
+  toBuffer (v) {
+    if (!Buffer.isBuffer(v)) {
+      if (Array.isArray(v)) {
+        v = Buffer.from(v)
+      } else if (typeof v === 'string') {
+        if (this.isHexString(v)) {
+          v = Buffer.from(this.padToEven(stripHexPrefix(v)), 'hex')
+        } else {
+          v = Buffer.from(v)
+        }
+      } else if (typeof v === 'number') {
+        v = this.intToBuffer(v)
+      } else if (v === null || v === undefined) {
+        v = Buffer.allocUnsafe(0)
+      } else if (BN.isBN(v)) {
+        v = v.toArrayLike(Buffer)
+      } else if (v.toArray) {
+        // converts a BN to a Buffer
+        v = Buffer.from(v.toArray())
+      } else {
+        throw new Error('invalid type')
+      }
+    }
+    return v
+  }
+
+  padToEven (value) {
+    let a = value; // eslint-disable-line
+    if (typeof a !== 'string') {
+      throw new Error(`[ethjs-util] while padding to even, value must be string, is currently ${typeof a}, while padToEven.`)
+    }
+    if (a.length % 2) {
+      a = `0${a}`
+    }
+    return a
+  }
+
+  baToJSON (ba) {
+    if (Buffer.isBuffer(ba)) {
+      return '0x' + ba.toString('hex')
+    } else if (ba instanceof Array) {
+      const array = []
+      for (let i = 0; i < ba.length; i++) {
+        array.push(this.baToJSON(ba[i]))
+      }
+      return array
+    }
+  }
+
+  stripZeros (a) {
+    a = stripHexPrefix(a)
+    let first = a[0]
+    while (a.length > 0 && first.toString() === '0') {
+      a = a.slice(1)
+      first = a[0]
+    }
+    return a
+  }
+
+  /**
+   * Is the string a hex string.
+   *
+   * @method check if string is hex string of specific length
+   * @param {String} value
+   * @param {Number} length
+   * @returns {Boolean} output the string is a hex string
+   */
+  isHexString (value, length) {
+    if (typeof (value) !== 'string' || !value.match(/^0x[0-9A-Fa-f]*$/)) {
+      return false
+    }
+    if (length && value.length !== 2 + 2 * length) { return false }
+    return true
+  }
+  /**
+   * Converts an `Number` to a `Buffer`
+   * @param {Number} i
+   * @return {Buffer}
+   */
+  intToBuffer (i) {
+    const hex = this.intToHex(i)
+    return new Buffer(this.padToEven(hex.slice(2)), 'hex')
+  }
+
+  /**
+   * Converts a `Number` into a hex `String`
+   * @param {Number} i
+   * @return {String}
+   */
+  intToHex (i) {
+    let hex = i.toString(16); // eslint-disable-line
+    return `0x${hex}`
+  }
+
+  /**
+   * Creates SHA-3 hash of the RLP encoded version of the input
+   * @param {Buffer|Array|String|Number} a the input data
+   * @return {Buffer}
+   */
+  rlphash (a) {
+    return this.keccak(rlp.encode(a))
+  }
+
+  /**
+   * Creates Keccak hash of the input
+   * @param {Buffer|Array|String|Number} a the input data
+   * @param {Number} [bits=256] the Keccak width
+   * @return {Buffer}
+   */
+  keccak (a, bits) {
+    a = this.toBuffer(a)
+    if (!bits) bits = 256
+    return createKeccakHash('keccak' + bits).update(a).digest()
+  }
+
+  /**
+   * Returns a buffer filled with 0s
+   * @method zeros
+   * @param {Number} bytes  the number of bytes the buffer should be
+   * @return {Buffer}
+   */
+  zeros (bytes) {
+    return Buffer.allocUnsafe(bytes).fill(0)
   }
 }
 
