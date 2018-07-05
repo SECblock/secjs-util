@@ -1073,25 +1073,25 @@ class SecUtils {
     return this.isValidAddress(address) && (this.toChecksumAddress(address) === address)
   }
 
-  // /**
-  //  * Generates an address of a newly created contract
-  //  * @param {Buffer} from the address which is creating this new address
-  //  * @param {Buffer} nonce the nonce of the from account
-  //  * @return {Buffer}
-  //  */
-  // generateAddress (from, nonce) {
-  //   from = toBuffer(from)
-  //   nonce = new BN(nonce)
-  //   if (nonce.isZero()) {
-  //     // in RLP we want to encode null in the case of zero nonce
-  //     // read the RLP documentation for an answer if you dare
-  //     nonce = null
-  //   } else {
-  //     nonce = Buffer.from(nonce.toArray())
-  //   }/*  */
-  //   // Only take the lower 160bits of the hash
-  //   return rlphash([from, nonce]).slice(-20)
-  // }
+  /**
+   * Generates an address of a newly created contract
+   * @param {Buffer} from the address which is creating this new address
+   * @param {Buffer} nonce the nonce of the from account
+   * @return {Buffer}
+   */
+  generateContractAddress (from, nonce) {
+    from = toBuffer(from)
+    nonce = new BN(nonce)
+    if (nonce.isZero()) {
+      // in RLP we want to encode null in the case of zero nonce
+      // read the RLP documentation for an answer if you dare
+      nonce = null
+    } else {
+      nonce = Buffer.from(nonce.toArray())
+    }/*  */
+    // Only take the lower 160bits of the hash
+    return rlphash([from, nonce]).slice(-20)
+  }
 
   /**
    * Returns true if the supplied address belongs to a precompiled account (Byzantium)
