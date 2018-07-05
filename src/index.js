@@ -1,6 +1,7 @@
-'strict mode'
+
 const secp256k1 = require('secp256k1')
 const createKeccakHash = require('keccak')
+const isHexPrefixed = require('is-hex-prefixed')
 const stripHexPrefix = require('strip-hex-prefix')
 const assert = require('assert')
 const Buffer = require('safe-buffer').Buffer
@@ -74,6 +75,7 @@ class SecUtils {
     this.BN = BN
     this.secp256k1 = secp256k1
     this.rlp = rlp
+    this.sha3 = ''
 
     this.date = ''
     this.CurrentUnixtime = ''
@@ -440,6 +442,17 @@ class SecUtils {
     }
   }
 
+  padToEven (value) {
+    let a = value; // eslint-disable-line
+    if (typeof a !== 'string') {
+      throw new Error(`[secjs-util] while padding to even, value must be string, is currently ${typeof a}, while padToEven.`)
+    }
+    if (a.length % 2) {
+      a = `0${a}`
+    }
+    return a
+  }
+
   toBuffer (v) {
     if (!Buffer.isBuffer(v)) {
       if (Array.isArray(v)) {
@@ -464,17 +477,6 @@ class SecUtils {
       }
     }
     return v
-  }
-
-  padToEven (value) {
-    let a = value; // eslint-disable-line
-    if (typeof a !== 'string') {
-      throw new Error(`[ethjs-util] while padding to even, value must be string, is currently ${typeof a}, while padToEven.`)
-    }
-    if (a.length % 2) {
-      a = `0${a}`
-    }
-    return a
   }
 
   baToJSON (ba) {
@@ -563,6 +565,591 @@ class SecUtils {
    */
   zeros (bytes) {
     return Buffer.allocUnsafe(bytes).fill(0)
+  }
+
+  /**
+ * Get the binary size of a string
+ * @param {String} str
+ * @return {Number}
+ */
+  getBinarySize (str) {
+    if (typeof str !== 'string') {
+      throw new Error(`[secjs-util] while getting binary size, method getBinarySize requires input 'str' to be type String, got '${typeof str}'.`)
+    }
+
+    return Buffer.byteLength(str, 'utf8')
+  }
+
+  /**
+   * Returns TRUE if the first specified array contains all elements
+   * from the second one. FALSE otherwise.
+   *
+   * @param {array} superset
+   * @param {array} subset
+   *
+   * @returns {boolean}
+   */
+  arrayContainsArray (superset, subset, some) {
+    if (Array.isArray(superset) !== true) { throw new Error(`[secjs-util] method arrayContainsArray requires input 'superset' to be an array got type '${typeof superset}'`) }
+    if (Array.isArray(subset) !== true) { throw new Error(`[secjs-util] method arrayContainsArray requires input 'subset' to be an array got type '${typeof subset}'`) }
+
+    return subset[Boolean(some) & 'some' || 'every']((value) => (superset.indexOf(value) >= 0))
+  }
+
+  /**
+   * Should be called to get utf8 from it's hex representation
+   *
+   * @method toUtf8
+   * @param {String} string in hex
+   * @returns {String} ascii string representation of hex value
+   */
+  toUtf8 (hex) {
+    const bufferValue = new Buffer(this.padToEven(stripHexPrefix(hex).replace(/^0+|0+$/g, '')), 'hex')
+
+    return bufferValue.toString('utf8')
+  }
+
+  /**
+   * Should be called to get ascii from it's hex representation
+   *
+   * @method toAscii
+   * @param {String} string in hex
+   * @returns {String} ascii string representation of hex value
+   */
+  toAscii (hex) {
+    let str = '' // eslint-disable-line
+    let i = 0, l = hex.length // eslint-disable-line
+
+    if (hex.substring(0, 2) === '0x') {
+      i = 2
+    }
+
+    for (; i < l; i += 2) {
+      const code = parseInt(hex.substr(i, 2), 16)
+      str += String.fromCharCode(code)
+    }
+
+    return str
+  }
+
+  /**
+   * Should be called to get hex representation (prefixed by 0x) of utf8 string
+   *
+   * @method fromUtf8
+   * @param {String} string
+   * @param {Number} optional padding
+   * @returns {String} hex representation of input string
+   */
+  fromUtf8 (stringValue) {
+    const str = new Buffer(stringValue, 'utf8')
+
+    return `0x${this.padToEven(str.toString('hex')).replace(/^0+|0+$/g, '')}`
+  }
+
+  /**
+   * Should be called to get hex representation (prefixed by 0x) of ascii string
+   *
+   * @method fromAscii
+   * @param {String} string
+   * @param {Number} optional padding
+   * @returns {String} hex representation of input string
+   */
+  fromAscii (stringValue) {
+    let hex = '' // eslint-disable-line
+    for (let i = 0; i < stringValue.length; i++) { // eslint-disable-line
+      const code = stringValue.charCodeAt(i)
+      const n = code.toString(16)
+      hex += n.length < 2 ? `0${n}` : n
+    }
+
+    return `0x${hex}`
+  }
+
+  /**
+   * getKeys([{a: 1, b: 2}, {a: 3, b: 4}], 'a') => [1, 3]
+   *
+   * @method getKeys get specific key from inner object array of objects
+   * @param {String} params
+   * @param {String} key
+   * @param {Boolean} allowEmpty
+   * @returns {Array} output just a simple array of output keys
+   */
+  getKeys (params, key, allowEmpty) {
+    if (!Array.isArray(params)) { throw new Error(`[secjs-util] method getKeys expecting type Array as 'params' input, got '${typeof params}'`) }
+    if (typeof key !== 'string') { throw new Error(`[secjs-util] method getKeys expecting type String for input 'key' got '${typeof key}'.`) }
+
+    let result = []; // eslint-disable-line
+
+    for (let i = 0; i < params.length; i++) { // eslint-disable-line
+      let value = params[i][key]; // eslint-disable-line
+      if (allowEmpty && !value) {
+        value = ''
+      } else if (typeof (value) !== 'string') {
+        throw new Error('invalid abi')
+      }
+      result.push(value)
+    }
+    return result
+  }
+  /**
+   * Converts a `Buffer` into a hex `String`
+   * @param {Buffer} buf
+   * @return {String}
+   */
+  bufferToHex (buf) {
+    buf = this.toBuffer(buf)
+    return '0x' + buf.toString('hex')
+  }
+  /**
+    * Returns a zero address
+    * @method zeroAddress
+    * @return {String}
+    */
+  zeroAddress () {
+    const addressLength = 20
+    const zeroAddress = this.zeros(addressLength)
+    return this.bufferToHex(zeroAddress)
+  }
+
+  /**
+ * Left Pads an `Array` or `Buffer` with leading zeros till it has `length` bytes.
+ * Or it truncates the beginning if it exceeds.
+ * @method lsetLength
+ * @param {Buffer|Array} msg the value to pad
+ * @param {Number} length the number of bytes the output should be
+ * @param {Boolean} [right=false] whether to start padding form the left or right
+ * @return {Buffer|Array}
+ */
+  setLengthLeft (msg, length, right) { // setLengthLeft
+    const buf = this.zeros(length)
+    msg = this.toBuffer(msg)
+    if (right) {
+      if (msg.length < length) {
+        msg.copy(buf)
+        return buf
+      }
+      return msg.slice(0, length)
+    } else {
+      if (msg.length < length) {
+        msg.copy(buf, length - msg.length)
+        return buf
+      }
+      return msg.slice(-length)
+    }
+  }
+
+  setLength () {
+    return this.setLengthLeft
+  }
+
+  /**
+   * Right Pads an `Array` or `Buffer` with leading zeros till it has `length` bytes.
+   * Or it truncates the beginning if it exceeds.
+   * @param {Buffer|Array} msg the value to pad
+   * @param {Number} length the number of bytes the output should be
+   * @return {Buffer|Array}
+   */
+  setLengthRight (msg, length) {
+    return this.setLengthLeft(msg, length, true)
+  }
+
+  /**
+   * Converts a `Buffer` to a `Number`
+   * @param {Buffer} buf
+   * @return {Number}
+   * @throws If the input number exceeds 53 bits.
+   */
+  bufferToInt (buf) {
+    return new BN(this.toBuffer(buf)).toNumber()
+  }
+
+  /**
+   * Interprets a `Buffer` as a signed integer and returns a `BN`. Assumes 256-bit numbers.
+   * @param {Buffer} num
+   * @return {BN}
+   */
+  fromSigned (num) {
+    return new BN(num).fromTwos(256)
+  }
+
+  /**
+   * Converts a `BN` to an unsigned integer and returns it as a `Buffer`. Assumes 256-bit numbers.
+   * @param {BN} num
+   * @return {Buffer}
+   */
+  toUnsigned (num) {
+    return Buffer.from(num.toTwos(256).toArray())
+  }
+
+  // /**
+  //  * Creates Keccak hash of the input
+  //  * @param {Buffer|Array|String|Number} a the input data
+  //  * @param {Number} [bits=256] the Keccak width
+  //  * @return {Buffer}
+  //  */
+  // exports.keccak = function (a, bits) {
+  //   a = exports.toBuffer(a)
+  //   if (!bits) bits = 256
+
+  //   return createKeccakHash('keccak' + bits).update(a).digest()
+  // }
+
+  /**
+   * Creates Keccak-256 hash of the input, alias for keccak(a, 256)
+   * @param {Buffer|Array|String|Number} a the input data
+   * @return {Buffer}
+   */
+  keccak256 (a) {
+    return this.keccak(a)
+  }
+
+  /**
+   * Creates SHA-3 (Keccak) hash of the input [OBSOLETE]
+   * @param {Buffer|Array|String|Number} a the input data
+   * @param {Number} [bits=256] the SHA-3 width
+   * @return {Buffer}
+   */
+  sha3 () {
+    return this.keccak
+  }
+
+  /**
+   * Creates SHA256 hash of the input
+   * @param {Buffer|Array|String|Number} a the input data
+   * @return {Buffer}
+   */
+  sha256 (a) {
+    a = this.toBuffer(a)
+    return this.createHash('sha256').update(a).digest()
+  }
+
+  /**
+   * Creates RIPEMD160 hash of the input
+   * @param {Buffer|Array|String|Number} a the input data
+   * @param {Boolean} padded whether it should be padded to 256 bits or not
+   * @return {Buffer}
+   */
+  ripemd160 (a, padded) {
+    a = this.toBuffer(a)
+    const hash = this.createHash('rmd160').update(a).digest()
+    if (padded === true) {
+      return this.setLength(hash, 32)
+    } else {
+      return hash
+    }
+  }
+
+  // /**
+  //  * Creates SHA-3 hash of the RLP encoded version of the input
+  //  * @param {Buffer|Array|String|Number} a the input data
+  //  * @return {Buffer}
+  //  */
+  // exports.rlphash = function (a) {
+  //   return exports.keccak(rlp.encode(a))
+  // }
+
+  /**
+   * Checks if the private key satisfies the rules of the curve secp256k1.
+   * @param {Buffer} privateKey
+   * @return {Boolean}
+   */
+  isValidPrivate (privateKey) {
+    return secp256k1.privateKeyVerify(privateKey)
+  }
+
+  /**
+   * Checks if the public key satisfies the rules of the curve secp256k1
+   * and the requirements of Ethereum.
+   * @param {Buffer} publicKey The two points of an uncompressed key, unless sanitize is enabled
+   * @param {Boolean} [sanitize=false] Accept public keys in other formats
+   * @return {Boolean}
+   */
+  isValidPublic (publicKey, sanitize) {
+    if (publicKey.length === 64) {
+      // Convert to SEC1 for secp256k1
+      return secp256k1.publicKeyVerify(Buffer.concat([Buffer.from([4]), publicKey]))
+    }
+
+    if (!sanitize) {
+      return false
+    }
+
+    return secp256k1.publicKeyVerify(publicKey)
+  }
+
+  /**
+   * Returns the ethereum address of a given public key.
+   * Accepts "Ethereum public keys" and SEC1 encoded keys.
+   * @param {Buffer} pubKey The two points of an uncompressed key, unless sanitize is enabled
+   * @param {Boolean} [sanitize=false] Accept public keys in other formats
+   * @return {Buffer}
+   */
+  publicToAddress (pubKey, sanitize) {
+    pubKey = this.toBuffer(pubKey)
+    if (sanitize && (pubKey.length !== 64)) {
+      pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
+    }
+    assert(pubKey.length === 64)
+    // Only take the lower 160bits of the hash
+    return this.keccak(pubKey).slice(-20)
+  }
+
+  /**
+   * Returns the ethereum public key of a given private key
+   * @param {Buffer} privateKey A private key must be 256 bits wide
+   * @return {Buffer}
+   */
+  privateToPublic (privateKey) {
+    privateKey = this.toBuffer(privateKey)
+    // skip the type flag and use the X, Y points
+    return secp256k1.publicKeyCreate(privateKey, false).slice(1)
+  }
+
+  /**
+   * Converts a public key to the Ethereum format.
+   * @param {Buffer} publicKey
+   * @return {Buffer}
+   */
+  importPublic (publicKey) {
+    publicKey = this.toBuffer(publicKey)
+    if (publicKey.length !== 64) {
+      publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
+    }
+    return publicKey
+  }
+
+  /**
+   * ECDSA sign
+   * @param {Buffer} msgHash
+   * @param {Buffer} privateKey
+   * @return {Object}
+   */
+  ecsign (msgHash, privateKey) {
+    const sig = secp256k1.sign(msgHash, privateKey)
+
+    const ret = {}
+    ret.r = sig.signature.slice(0, 32)
+    ret.s = sig.signature.slice(32, 64)
+    ret.v = sig.recovery + 27
+    return ret
+  }
+
+  /**
+   * Returns the keccak-256 hash of `message`, prefixed with the header used by the `eth_sign` RPC call.
+   * The output of this function can be fed into `ecsign` to produce the same signature as the `eth_sign`
+   * call for a given `message`, or fed to `ecrecover` along with a signature to recover the public key
+   * used to produce the signature.
+   * @param message
+   * @returns {Buffer} hash
+   */
+  hashPersonalMessage (message) {
+    const prefix = this.toBuffer('\u0019Ethereum Signed Message:\n' + message.length.toString())
+    return this.keccak(Buffer.concat([prefix, message]))
+  }
+
+  /**
+   * ECDSA public key recovery from signature
+   * @param {Buffer} msgHash
+   * @param {Number} v
+   * @param {Buffer} r
+   * @param {Buffer} s
+   * @return {Buffer} publicKey
+   */
+  ecrecover (msgHash, v, r, s) {
+    const signature = Buffer.concat([this.setLength(r, 32), this.setLength(s, 32)], 64)
+    const recovery = v - 27
+    if (recovery !== 0 && recovery !== 1) {
+      throw new Error('Invalid signature v value')
+    }
+    const senderPubKey = secp256k1.recover(msgHash, signature, recovery)
+    return secp256k1.publicKeyConvert(senderPubKey, false).slice(1)
+  }
+
+  /**
+   * Convert signature parameters into the format of `eth_sign` RPC method
+   * @param {Number} v
+   * @param {Buffer} r
+   * @param {Buffer} s
+   * @return {String} sig
+   */
+  toRpcSig (v, r, s) {
+    // NOTE: with potential introduction of chainId this might need to be updated
+    if (v !== 27 && v !== 28) {
+      throw new Error('Invalid recovery id')
+    }
+
+    // geth (and the RPC eth_sign method) uses the 65 byte format used by Bitcoin
+    // FIXME: this might change in the future - https://github.com/ethereum/go-ethereum/issues/2053
+    return this.bufferToHex(Buffer.concat([
+      this.setLengthLeft(r, 32),
+      this.setLengthLeft(s, 32),
+      this.toBuffer(v - 27)
+    ]))
+  }
+
+  /**
+   * Convert signature format of the `eth_sign` RPC method to signature parameters
+   * NOTE: all because of a bug in geth: https://github.com/ethereum/go-ethereum/issues/2053
+   * @param {String} sig
+   * @return {Object}
+   */
+  fromRpcSig (sig) {
+    sig = this.toBuffer(sig)
+
+    // NOTE: with potential introduction of chainId this might need to be updated
+    if (sig.length !== 65) {
+      throw new Error('Invalid signature length')
+    }
+
+    let v = sig[64]
+    // support both versions of `eth_sign` responses
+    if (v < 27) {
+      v += 27
+    }
+
+    return {
+      v: v,
+      r: sig.slice(0, 32),
+      s: sig.slice(32, 64)
+    }
+  }
+
+  /**
+   * Returns the ethereum address of a given private key
+   * @param {Buffer} privateKey A private key must be 256 bits wide
+   * @return {Buffer}
+   */
+  privateToAddress (privateKey) {
+    return this.publicToAddress(this.privateToPublic(privateKey))
+  }
+
+  /**
+   * Checks if the address is a valid. Accepts checksummed addresses too
+   * @param {String} address
+   * @return {Boolean}
+   */
+  isValidAddress (address) {
+    return /^0x[0-9a-fA-F]{40}$/.test(address)
+  }
+
+  /**
+    * Checks if a given address is a zero address
+    * @method isZeroAddress
+    * @param {String} address
+    * @return {Boolean}
+    */
+  isZeroAddress (address) {
+    const zeroAddress = this.zeroAddress()
+    return zeroAddress === this.addHexPrefix(address)
+  }
+
+  /**
+   * Returns a checksummed address
+   * @param {String} address
+   * @return {String}
+   */
+  toChecksumAddress (address) {
+    address = stripHexPrefix(address).toLowerCase()
+    const hash = this.keccak(address).toString('hex')
+    let ret = '0x'
+
+    for (let i = 0; i < address.length; i++) {
+      if (parseInt(hash[i], 16) >= 8) {
+        ret += address[i].toUpperCase()
+      } else {
+        ret += address[i]
+      }
+    }
+
+    return ret
+  }
+
+  /**
+   * Checks if the address is a valid checksummed address
+   * @param {Buffer} address
+   * @return {Boolean}
+   */
+  isValidChecksumAddress (address) {
+    return this.isValidAddress(address) && (this.toChecksumAddress(address) === address)
+  }
+
+  // /**
+  //  * Generates an address of a newly created contract
+  //  * @param {Buffer} from the address which is creating this new address
+  //  * @param {Buffer} nonce the nonce of the from account
+  //  * @return {Buffer}
+  //  */
+  // generateAddress (from, nonce) {
+  //   from = toBuffer(from)
+  //   nonce = new BN(nonce)
+  //   if (nonce.isZero()) {
+  //     // in RLP we want to encode null in the case of zero nonce
+  //     // read the RLP documentation for an answer if you dare
+  //     nonce = null
+  //   } else {
+  //     nonce = Buffer.from(nonce.toArray())
+  //   }/*  */
+  //   // Only take the lower 160bits of the hash
+  //   return rlphash([from, nonce]).slice(-20)
+  // }
+
+  /**
+   * Returns true if the supplied address belongs to a precompiled account (Byzantium)
+   * @param {Buffer|String} address
+   * @return {Boolean}
+   */
+  isPrecompiled (address) {
+    let a = this.unpad(address)
+    return a.length === 1 && a[0] >= 1 && a[0] <= 8
+  }
+
+  /**
+   * Adds "0x" to a given `String` if it does not already start with "0x"
+   * @param {String} str
+   * @return {String}
+   */
+  addHexPrefix (str) {
+    if (typeof str !== 'string') {
+      return str
+    }
+
+    return isHexPrefixed(str) ? str : '0x' + str
+  }
+
+  /**
+   * Validate ECDSA signature
+   * @method isValidSignature
+   * @param {Buffer} v
+   * @param {Buffer} r
+   * @param {Buffer} s
+   * @param {Boolean} [homestead=true]
+   * @return {Boolean}
+   */
+
+  isValidSignature (v, r, s, homestead) {
+    const SECP256K1_N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
+    const SECP256K1_N = new BN('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141', 16)
+
+    if (r.length !== 32 || s.length !== 32) {
+      return false
+    }
+
+    if (v !== 27 && v !== 28) {
+      return false
+    }
+
+    r = new BN(r)
+    s = new BN(s)
+
+    if (r.isZero() || r.gt(SECP256K1_N) || s.isZero() || s.gt(SECP256K1_N)) {
+      return false
+    }
+
+    if ((homestead === false) && (new BN(s).cmp(SECP256K1_N_DIV_2) === 1)) {
+      return false
+    }
+
+    return true
   }
 }
 
