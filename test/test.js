@@ -3,6 +3,68 @@ const assert = require('chai').assert
 const BN = require('bn.js')
 const Buffer = require('safe-buffer').Buffer
 const util = new SecUtil()
+const expect = require('chai').expect
+
+describe('currentUnixTimeInMillisecond', function () {
+  it('should generate a unix timestamp in ms', () => {
+    util.currentUnixTimeInMillisecond(function (value) {
+      expect(value).to.equal(1530641896147)
+    })
+  })
+})
+
+describe('currentUnixTimeSecond', function () {
+  it('should generate a unix timestamp in s', () => {
+    util.currentUnixTimeSecond(function (value) {
+      expect(value).to.equal(1530973479)
+    })
+  })
+})
+
+describe('getPrivateKey', function () {
+  it('should generate a SEC PrivateKey', () => {
+    util.getsecWifFinal(function (value) {
+      expect(value).to.equal('b04b70347f4938fa990eee28b061dd58532230f3f506d7fbfecfd1af14b03b44')
+    })
+  })
+})
+describe('getsecWifFinal', function () {
+  it('should generate a SEC WifiAdress', () => {
+    util.getsecWifFinal(function (value) {
+      expect(value).to.equal('5JXH4xuX1DAY2MJN4DDyPjm6eds6BJ2SRKpJXDDkMNTitbQJFLS')
+    })
+  })
+})
+
+describe('getPublicKey', function () {
+  it('should generate a SEC PublicKey', () => {
+    util.getPrivateKey(function (value) {
+      expect(value).to.equal('bf4329f1fb4c004703dafe9210d9c42e6602c3f9a94c608b1c30c85302e55feba720ede405e12f5ce370c2ba3998cbad3ab478c020d45bca313815d82601275a')
+    })
+  })
+})
+
+describe('getAddress', function () {
+  it('should generate a SEC Address', () => {
+    util.getAddress(function (value) {
+      expect(value).to.equal('FNBaESsdd41RhrFTdu1cSmveY4uFrRHgs')
+    })
+  })
+})
+// let b = 1527717126082 // any unix time
+// let c = util.getDatetime(b)
+// console.log('convert to datetime ' + c)
+
+// let d = '2014-04-23 18:55:49:123' // any date time
+// let e = util.getUnixtime(d)
+// console.log('convert to unixtime ' + e)
+
+// util.refreshTimeDifference((err, timeDiff) => {
+//   if (err) {
+//     console.log(err)
+//   }
+//   console.log('timeDiff' + timeDiff)
+// })
 
 describe('zeros function', function () {
   it('should produce lots of 0s', function () {
@@ -456,7 +518,7 @@ describe('toBuffer', function () {
     // 'toBN'
     assert.deepEqual(util.toBuffer(new BN(1)), Buffer.from([1]))
     // 'toArray'
-    assert.deepEqual(util.toBuffer({ toArray: function () { return [ 1 ] } }), Buffer.from([1]))
+    assert.deepEqual(util.toBuffer({ toArray: function () { return [1] } }), Buffer.from([1]))
   })
   it('should fail', function () {
     assert.throws(function () {

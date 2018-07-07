@@ -1109,11 +1109,7 @@ class SecUtils {
    * @return {Buffer}
    */
   generateContractAddress (from, nonce) {
-<<<<<<< Updated upstream
-    from = toBuffer(from)
-=======
     from = this.toBuffer(from)
->>>>>>> Stashed changes
     nonce = new BN(nonce)
     if (nonce.isZero()) {
       // in RLP we want to encode null in the case of zero nonce
@@ -1123,11 +1119,7 @@ class SecUtils {
       nonce = Buffer.from(nonce.toArray())
     }/*  */
     // Only take the lower 160bits of the hash
-<<<<<<< Updated upstream
-    return rlphash([from, nonce]).slice(-20)
-=======
     return this.rlphash([from, nonce]).slice(-20)
->>>>>>> Stashed changes
   }
 
   /**
