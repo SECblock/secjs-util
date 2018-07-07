@@ -1,6 +1,7 @@
 
 const secp256k1 = require('secp256k1')
 const createKeccakHash = require('keccak')
+const createHash = require('create-hash')
 const isHexPrefixed = require('is-hex-prefixed')
 const stripHexPrefix = require('strip-hex-prefix')
 const assert = require('assert')
@@ -502,6 +503,20 @@ class SecUtils {
   }
 
   /**
+   * Trims leading zeros from a `Buffer` or an `Array`
+   * @param {Buffer|Array|String} a
+   * @return {Buffer|Array|String}
+   */
+  unpad (a) {
+    a = stripHexPrefix(a)
+    let first = a[0]
+    while (a.length > 0 && first.toString() === '0') {
+      a = a.slice(1)
+      first = a[0]
+    }
+    return a
+  }
+  /**
    * Is the string a hex string.
    *
    * @method check if string is hex string of specific length
@@ -593,7 +608,7 @@ class SecUtils {
     if (Array.isArray(superset) !== true) { throw new Error(`[secjs-util] method arrayContainsArray requires input 'superset' to be an array got type '${typeof superset}'`) }
     if (Array.isArray(subset) !== true) { throw new Error(`[secjs-util] method arrayContainsArray requires input 'subset' to be an array got type '${typeof subset}'`) }
 
-    return subset[Boolean(some) & 'some' || 'every']((value) => (superset.indexOf(value) >= 0))
+    return subset[Boolean(some) && 'some' || 'every']((value) => (superset.indexOf(value) >= 0))
   }
 
   /**
@@ -720,7 +735,7 @@ class SecUtils {
  * @param {Boolean} [right=false] whether to start padding form the left or right
  * @return {Buffer|Array}
  */
-  setLengthLeft (msg, length, right) { // setLengthLeft
+  setLengthLeft (msg, length, right) {
     const buf = this.zeros(length)
     msg = this.toBuffer(msg)
     if (right) {
@@ -738,8 +753,22 @@ class SecUtils {
     }
   }
 
-  setLength () {
-    return this.setLengthLeft
+  setLength (msg, length, right) {
+    const buf = this.zeros(length)
+    msg = this.toBuffer(msg)
+    if (right) {
+      if (msg.length < length) {
+        msg.copy(buf)
+        return buf
+      }
+      return msg.slice(0, length)
+    } else {
+      if (msg.length < length) {
+        msg.copy(buf, length - msg.length)
+        return buf
+      }
+      return msg.slice(-length)
+    }
   }
 
   /**
@@ -820,7 +849,7 @@ class SecUtils {
    */
   sha256 (a) {
     a = this.toBuffer(a)
-    return this.createHash('sha256').update(a).digest()
+    return createHash('sha256').update(a).digest()
   }
 
   /**
@@ -831,9 +860,9 @@ class SecUtils {
    */
   ripemd160 (a, padded) {
     a = this.toBuffer(a)
-    const hash = this.createHash('rmd160').update(a).digest()
+    const hash = createHash('rmd160').update(a).digest()
     if (padded === true) {
-      return this.setLength(hash, 32)
+      return this.setLengthLeft(hash, 32)
     } else {
       return hash
     }
@@ -859,7 +888,7 @@ class SecUtils {
 
   /**
    * Checks if the public key satisfies the rules of the curve secp256k1
-   * and the requirements of Ethereum.
+   * and the requirements of SEC.
    * @param {Buffer} publicKey The two points of an uncompressed key, unless sanitize is enabled
    * @param {Boolean} [sanitize=false] Accept public keys in other formats
    * @return {Boolean}
@@ -878,8 +907,8 @@ class SecUtils {
   }
 
   /**
-   * Returns the ethereum address of a given public key.
-   * Accepts "Ethereum public keys" and SEC1 encoded keys.
+   * Returns the SEC address of a given public key.
+   * Accepts "SEC public keys" and SEC1 encoded keys.
    * @param {Buffer} pubKey The two points of an uncompressed key, unless sanitize is enabled
    * @param {Boolean} [sanitize=false] Accept public keys in other formats
    * @return {Buffer}
@@ -895,7 +924,7 @@ class SecUtils {
   }
 
   /**
-   * Returns the ethereum public key of a given private key
+   * Returns the SEC public key of a given private key
    * @param {Buffer} privateKey A private key must be 256 bits wide
    * @return {Buffer}
    */
@@ -906,7 +935,7 @@ class SecUtils {
   }
 
   /**
-   * Converts a public key to the Ethereum format.
+   * Converts a public key to the SEC format.
    * @param {Buffer} publicKey
    * @return {Buffer}
    */
@@ -935,8 +964,8 @@ class SecUtils {
   }
 
   /**
-   * Returns the keccak-256 hash of `message`, prefixed with the header used by the `eth_sign` RPC call.
-   * The output of this function can be fed into `ecsign` to produce the same signature as the `eth_sign`
+   * Returns the keccak-256 hash of `message`, prefixed with the header used by the `SEC_sign` RPC call.
+   * The output of this function can be fed into `ecsign` to produce the same signature as the `SEC_sign`
    * call for a given `message`, or fed to `ecrecover` along with a signature to recover the public key
    * used to produce the signature.
    * @param message
@@ -956,7 +985,7 @@ class SecUtils {
    * @return {Buffer} publicKey
    */
   ecrecover (msgHash, v, r, s) {
-    const signature = Buffer.concat([this.setLength(r, 32), this.setLength(s, 32)], 64)
+    const signature = Buffer.concat([this.setLengthLeft(r, 32), this.setLengthLeft(s, 32)], 64)
     const recovery = v - 27
     if (recovery !== 0 && recovery !== 1) {
       throw new Error('Invalid signature v value')
@@ -966,7 +995,7 @@ class SecUtils {
   }
 
   /**
-   * Convert signature parameters into the format of `eth_sign` RPC method
+   * Convert signature parameters into the format of `SEC_sign` RPC method
    * @param {Number} v
    * @param {Buffer} r
    * @param {Buffer} s
@@ -978,8 +1007,8 @@ class SecUtils {
       throw new Error('Invalid recovery id')
     }
 
-    // geth (and the RPC eth_sign method) uses the 65 byte format used by Bitcoin
-    // FIXME: this might change in the future - https://github.com/ethereum/go-ethereum/issues/2053
+    // geth (and the RPC SEC_sign method) uses the 65 byte format used by Bitcoin
+    // FIXME: this might change in the future - https://github.com/
     return this.bufferToHex(Buffer.concat([
       this.setLengthLeft(r, 32),
       this.setLengthLeft(s, 32),
@@ -988,8 +1017,8 @@ class SecUtils {
   }
 
   /**
-   * Convert signature format of the `eth_sign` RPC method to signature parameters
-   * NOTE: all because of a bug in geth: https://github.com/ethereum/go-ethereum/issues/2053
+   * Convert signature format of the `SEC_sign` RPC method to signature parameters
+   * NOTE: all because of a bug in geth: https://github.com/
    * @param {String} sig
    * @return {Object}
    */
@@ -1002,7 +1031,7 @@ class SecUtils {
     }
 
     let v = sig[64]
-    // support both versions of `eth_sign` responses
+    // support both versions of `SEC_sign` responses
     if (v < 27) {
       v += 27
     }
@@ -1015,7 +1044,7 @@ class SecUtils {
   }
 
   /**
-   * Returns the ethereum address of a given private key
+   * Returns the SEC address of a given private key
    * @param {Buffer} privateKey A private key must be 256 bits wide
    * @return {Buffer}
    */
@@ -1080,7 +1109,11 @@ class SecUtils {
    * @return {Buffer}
    */
   generateContractAddress (from, nonce) {
+<<<<<<< Updated upstream
     from = toBuffer(from)
+=======
+    from = this.toBuffer(from)
+>>>>>>> Stashed changes
     nonce = new BN(nonce)
     if (nonce.isZero()) {
       // in RLP we want to encode null in the case of zero nonce
@@ -1090,7 +1123,11 @@ class SecUtils {
       nonce = Buffer.from(nonce.toArray())
     }/*  */
     // Only take the lower 160bits of the hash
+<<<<<<< Updated upstream
     return rlphash([from, nonce]).slice(-20)
+=======
+    return this.rlphash([from, nonce]).slice(-20)
+>>>>>>> Stashed changes
   }
 
   /**
@@ -1150,6 +1187,12 @@ class SecUtils {
     }
 
     return true
+  }
+  stripHexPrefix (str) {
+    if (typeof str !== 'string') {
+      return str
+    }
+    return isHexPrefixed(str) ? str.slice(2) : str
   }
 }
 
