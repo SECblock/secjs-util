@@ -608,7 +608,7 @@ class SecUtils {
     if (Array.isArray(superset) !== true) { throw new Error(`[secjs-util] method arrayContainsArray requires input 'superset' to be an array got type '${typeof superset}'`) }
     if (Array.isArray(subset) !== true) { throw new Error(`[secjs-util] method arrayContainsArray requires input 'subset' to be an array got type '${typeof subset}'`) }
 
-    return subset[Boolean(some) && 'some' || 'every']((value) => (superset.indexOf(value) >= 0))
+    return subset[(Boolean(some) && 'some') || 'every']((value) => (superset.indexOf(value) >= 0))
   }
 
   /**

@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "lint": "standard",
+    "test": "mocha test/test.js",
     "prepublishOnly": "npm run lint"
   },
   "repository": {
