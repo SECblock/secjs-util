@@ -812,19 +812,6 @@ class SecUtils {
     return Buffer.from(num.toTwos(256).toArray())
   }
 
-  // /**
-  //  * Creates Keccak hash of the input
-  //  * @param {Buffer|Array|String|Number} a the input data
-  //  * @param {Number} [bits=256] the Keccak width
-  //  * @return {Buffer}
-  //  */
-  // exports.keccak = function (a, bits) {
-  //   a = exports.toBuffer(a)
-  //   if (!bits) bits = 256
-
-  //   return createKeccakHash('keccak' + bits).update(a).digest()
-  // }
-
   /**
    * Creates Keccak-256 hash of the input, alias for keccak(a, 256)
    * @param {Buffer|Array|String|Number} a the input data
@@ -869,15 +856,6 @@ class SecUtils {
       return hash
     }
   }
-
-  // /**
-  //  * Creates SHA-3 hash of the RLP encoded version of the input
-  //  * @param {Buffer|Array|String|Number} a the input data
-  //  * @return {Buffer}
-  //  */
-  // exports.rlphash = function (a) {
-  //   return exports.keccak(rlp.encode(a))
-  // }
 
   /**
    * Checks if the private key satisfies the rules of the curve secp256k1.
