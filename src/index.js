@@ -353,7 +353,7 @@ class SecUtils {
     self._fields = []
     self.toBuffer = this.toBuffer
     self.stripZero = this.stripZero
-    
+
     // attach the `toJSON`
     self.toJSON = function (label) {
       if (label) {
