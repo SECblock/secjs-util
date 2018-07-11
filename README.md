@@ -236,8 +236,6 @@ return four private key, wif private key, public key
 and sec address
 
 **Kind**: instance method of [<code>secUtil</code>](#secUtil)  
-### LICENSE
-MPL-2.0
 
 * * *
 ### generateContractAddress
@@ -951,18 +949,12 @@ const util = new SecUtils({
 })
 util.stripHexPrefix()
 ```
-
+### LICENSE
+MPL-2.0
 * * *
 # SEC工具库-中文简介
 
 Utils，是英语Utility（意思是功能，工具）的复数，Utilities的简写；是区块链开发的工具库；是内部由封装了多个功能函数（例如获取时间戳函数UnixTime等）的库组成。其作用是为进一步开发提供可直接调用的函数，可在下一步SEC区块数据结构和交易流程的开发中直接调用,使整个SEC区块链系统轻量、高效。
-主要的函数及其用途：
-
-1.  定义方法UnixTime():代表Unix时间戳；
-2.  定义方法getDatetime():将任意一个Unix时间戳转换为标准时间；
-3.  定义方法getUnixtime():将任意一个标准时间转化为Unix时间；
-
-
 
 SEC地址是为了减少接收方所需标识的字节数。SEC地址（secAddress）的生成步骤如下：
 
