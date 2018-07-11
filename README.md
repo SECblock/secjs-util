@@ -99,7 +99,9 @@ A utility function of getting a Unix timestamp in second.
 **Example**
 ```js
 const SecUtils = require('@sec-block/secjs-util')
-const util = new SecUtils()
+const util = new SecUtils({
+    timeServer: 'DE'
+})
 util.currentUnixTimeSecond()
 ```
 * * *
@@ -111,7 +113,9 @@ A utility function of getting a Unix timestamp in millisecond.
 **Example**
 ```js
 const SecUtils = require('@sec-block/secjs-util')
-const util = new SecUtils()
+const util = new SecUtils({
+    timeServer: 'DE'
+})
 util.currentUnixTimeInMillisecond()
 ```
 
@@ -179,7 +183,7 @@ util.refreshTimeDifference( (err, timeDiff) => {
 })
 ```
 
-
+* * *
 <a name="secUtil+hasha256"></a>
 
 ### hasha256(data)
@@ -191,6 +195,15 @@ A small function created as there is a lot of sha256 hashing.
 | --- | --- | --- |
 | data | <code>Buffer</code> | creat sha256 hash buffer |
 
+**Example**
+```js
+const SecUtils = require('@sec-block/secjs-util')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.hasha256(data)
+```
+* * *
 <a name="secUtil+generatePrivateKey"></a>
 
 ### generatePrivateKey()
@@ -202,7 +215,16 @@ generate check code. two times SHA256 at privatKey.
 base58(privat key + the version number + check code).
 it is used as WIF(Wallet import Format) privatKey
 
-**Kind**: instance method of [<code>secUtil</code>](#secUtil)  
+**Kind**: instance method of [<code>secUtil</code>](#secUtil) 
+**Example**
+```js
+const SecUtils = require('@sec-block/secjs-util')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.generatePrivateKey()
+``` 
+* * *
 <a name="secUtil+generatePublicKey"></a>
 
 ### generatePublicKey(key, addrVer)
@@ -214,7 +236,15 @@ generate public key
 | --- | --- | --- |
 | key | <code>Buffer</code> |  |
 | addrVer | <code>Buffer</code> | input addVer from generatePrivateKey() set elliptic point and x,y axis not sure whether useful let x = pubPoint.getX() let y = pubPoint.getY() use secp256k1. generate public key structe public key: 1(network ID) + 32bytes(from x axis) + 32bytes(from y axis) ripemd160(sha256(public key)) |
-
+**Example**
+```js
+const SecUtils = require('@sec-block/secjs-util')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.generatePublicKey(key, addrVer)
+``` 
+* * *
 <a name="secUtil+generateAddress"></a>
 
 ### generateAddress(publicKey, addrVer)
@@ -228,7 +258,15 @@ the 21 byte array. structe secBinary: 1(network ID) + concatHash + 4 byte(checks
 | --- | --- | --- |
 | publicKey | <code>Buffer</code> | input public key from generatePublicKey() |
 | addrVer | <code>Buffer</code> | input addVer from generatePrivateKey() generate WIF private key and translate to hex generate SEC Address and translate to hex |
-
+**Example**
+```js
+const SecUtils = require('@sec-block/secjs-util')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.generateAddress(publicKey, addrVer)
+``` 
+* * *
 <a name="secUtil+getPrivateKey"></a>
 
 ### getPrivateKey()
@@ -236,7 +274,14 @@ return four private key, wif private key, public key
 and sec address
 
 **Kind**: instance method of [<code>secUtil</code>](#secUtil)  
-
+**Example**
+```js
+const SecUtils = require('@sec-block/secjs-util')
+const util = new SecUtils({
+    timeServer: 'DE'
+})
+util.getPrivateKey()
+``` 
 * * *
 ### generateContractAddress
 A utility function of generating an address of a newly created contract
