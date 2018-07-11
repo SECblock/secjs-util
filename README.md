@@ -9,8 +9,8 @@ A collection of utility functions for secblock. It can be used in node.js or can
 
 **Kind**: global class
 * [SecUtils](#SecUtils)
-    * [.currentUnixTimeInMillisecond()](#currentUnixTimeInMillisecond)
     * [.currentUnixTimeSecond()](#currentUnixTimeSecond)
+    * [.currentUnixTimeInMillisecond()](#currentUnixTimeInMillisecond)
     * [.getDatetime()](#getDatetime) 
     * [.getUnixtime()](#getUnixtime)
     * [.asyncGetUTCTimeFromServer()](#asyncGetUTCTimeFromServer) 
@@ -91,16 +91,28 @@ util.func1()
 ```
 
 * * *
-<a name="UnixTime"></a>
+<a name="currentUnixTimeSecond"></a>
 
-### UnixTime
-A utility function of getting a Unix timestamp from using for the UnixTime(), which is integrated with an error handling process.
+### currentUnixTimeSecond
+A utility function of getting a Unix timestamp in second.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils()
-util.UnixTime()
+util.currentUnixTimeSecond()
+```
+* * *
+<a name="currentUnixTimeInMillisecond"></a>
+
+### currentUnixTimeInMillisecond
+A utility function of getting a Unix timestamp in millisecond.
+
+**Example**
+```js
+const SecUtils = require('@sec-block/secjs-util')
+const util = new SecUtils()
+util.currentUnixTimeInMillisecond()
 ```
 
 * * *
@@ -111,7 +123,7 @@ A utility function of converting a standard GMT time to a Unix timestamp.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -125,7 +137,7 @@ A utility function of converting a Unix timestamp to a standard GMT time.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -140,7 +152,7 @@ A utility function of get utc time from ntp server.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -155,7 +167,7 @@ A utility function to refresh the time difference between local host and ntp ser
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -233,7 +245,7 @@ A utility function of generating an address of a newly created contract
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -247,56 +259,11 @@ A utility function of generating an address of a newly created contract
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
 util.defineProperties(from, nonce)
-```
-* * *
-
-    * [.getUnixtime()](#getUnixtime) 
-<a name="getUnixtime"></a>
-
-### getUnixtime
-A utility function of converting a Unix timestamp to a standard GMT time.
-
-**Example**
-```js
-const SecUtils = require('../src/index')
-const util = new SecUtils({
-    timeServer: 'DE'
-})
-util.getUnixtime()
-```
-* * *
-<a name="generateContractAddress"></a>
-
-### generateContractAddress
-A utility function of generating an address of a newly created contract
-
-**Example**
-```js
-const SecUtils = require('../src/index')
-const util = new SecUtils({
-    timeServer: 'DE'
-})
-util.generateContractAddress(from, nonce)
-```
-
-* * *
-<a name="defineProperties"></a>
-
-### defineProperties
-Defines properties on a Object. It make the assumption that underlying data is binary.
-
-**Example**
-```js
-const SecUtils = require('../src/index')
-const util = new SecUtils({
-    timeServer: 'DE'
-})
-util.defineProperties()
 ```
 * * *
 <a name="padToEven"></a>
@@ -306,7 +273,7 @@ A utility function of adding a value in type of string.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -320,7 +287,7 @@ A utility function of adding a value to buffer.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -334,7 +301,7 @@ A utility function of converting buffer value to JSON format.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -348,7 +315,7 @@ A utility function of stripping zeros.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -362,7 +329,7 @@ A utility function of leading zeros from a `Buffer` or an `Array`.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -376,7 +343,7 @@ A utility function of confirming a hex string.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -390,7 +357,7 @@ A utility function of converting a `Number` to a `Buffer`.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -404,7 +371,7 @@ A utility function of converting `Number` into a hex `String`.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -418,7 +385,7 @@ A utility function of creating SHA-3 hash of the RLP encoded version of the inpu
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -432,7 +399,7 @@ A utility function of creating Keccak hash of the input.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -446,7 +413,7 @@ A utility function of returning a buffer filled with 0s.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -460,7 +427,7 @@ A utility function of getting the binary size of a string.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -474,7 +441,7 @@ A utility function of returning 'TRUE' if the first specified array contains all
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -488,7 +455,7 @@ A utility function of getting utf8 from its hex representation.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -502,7 +469,7 @@ A utility function of getting ascii from its hex representation.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -516,7 +483,7 @@ A utility function of getting hex representation (prefixed by 0x) of utf8 string
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -530,7 +497,7 @@ A utility function of getting hex representation (prefixed by 0x) of ascii strin
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -544,7 +511,7 @@ A utility function of getting specific key from inner object array of objects.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -558,7 +525,7 @@ A utility function of converting a `Buffer` into a hex `String`.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -572,7 +539,7 @@ A utility function of returning a zero address.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -586,7 +553,7 @@ A utility function of left padding an `Array` or `Buffer` with leading zeros til
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -600,7 +567,7 @@ A utility function of padding an `Array` or `Buffer` with leading zeros till it 
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -614,7 +581,7 @@ A utility function of right padding an `Array` or `Buffer` with leading zeros ti
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -628,7 +595,7 @@ A utility function of Converting a `Buffer` to a `Number`.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -642,7 +609,7 @@ A utility function of interpreting a `Buffer` as a signed integer and returns a 
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -656,7 +623,7 @@ A utility function of converting a `BN` to an unsigned integer and returns it as
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -670,7 +637,7 @@ A utility function of creating Keccak-256 hash of the input, alias for keccak(a,
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -684,7 +651,7 @@ A utility function of creating a keccak hash of input.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -698,7 +665,7 @@ A utility function of creating SHA256 hash of the input.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -712,7 +679,7 @@ A utility function of creating RIPEMD160 hash of the input.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -726,7 +693,7 @@ A utility function of checking if the private key satisfies the rules of the cur
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -740,7 +707,7 @@ A utility function of checking if the public key satisfies the rules of the curv
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -754,7 +721,7 @@ A utility function of returning the SEC address of a given public key accepting 
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -768,7 +735,7 @@ A utility function of returning the SEC public key of a given private key.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -782,7 +749,7 @@ A utility function of converting a public key to the SEC format.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -796,7 +763,7 @@ A utility function of ECDSA sign.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -810,7 +777,7 @@ A utility function of Returns the keccak-256 hash of `message`, prefixed with th
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -824,7 +791,7 @@ A utility function of ECDSA public key recovery from signature.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -838,7 +805,7 @@ A utility function of converting signature parameters into the format of `SEC_si
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -852,7 +819,7 @@ A utility function of converting signature format of the `SEC_sign` RPC method t
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -866,7 +833,7 @@ A utility function of returning the SEC address of a given private key.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -880,7 +847,7 @@ A utility function of checking if the address is a valid. Accepts checksummed ad
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -894,7 +861,7 @@ A ultiity function of checking if a given address is a zero address.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -908,7 +875,7 @@ A utility function of returning a checksummed address.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -922,7 +889,7 @@ A utility function of checking if the address is a valid checksummed address.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -936,7 +903,7 @@ A utility function of returning true if the supplied address belongs to a precom
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -950,7 +917,7 @@ A utility function of adding "0x" to a given `String` if it does not already sta
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -964,7 +931,7 @@ A utility function of validating ECDSA signature.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -978,7 +945,7 @@ A utility function of stripping hex sting.
 
 **Example**
 ```js
-const SecUtils = require('../src/index')
+const SecUtils = require('@sec-block/secjs-util')
 const util = new SecUtils({
     timeServer: 'DE'
 })
@@ -988,17 +955,12 @@ util.stripHexPrefix()
 * * *
 # SEC工具库-中文简介
 
-Utils，是英语Utility（意思是功能，工具）的复数，Utilities的简写；是区块链开发的工具库；是内部由封装了多个功能函数（例如获取时间戳函数UnixTime等）的库组成。其作用是为进一步开发提供可直接调用的函数，使整个SEC区块链系统轻量、高效。
+Utils，是英语Utility（意思是功能，工具）的复数，Utilities的简写；是区块链开发的工具库；是内部由封装了多个功能函数（例如获取时间戳函数UnixTime等）的库组成。其作用是为进一步开发提供可直接调用的函数，可在下一步SEC区块数据结构和交易流程的开发中直接调用,使整个SEC区块链系统轻量、高效。
 主要的函数及其用途：
 
-1.  定义方法UnixTime()
-	代表Unix时间戳；可在下一步SEC区块数据结构和交易流程的开发中直接调用。
-
-2.  定义方法getDatetime()
-	将任意一个Unix时间戳转换为标准时间
-	
-3.  定义方法getUnixtime()
-	将任意一个标准时间转化为Unix时间
+1.  定义方法UnixTime():代表Unix时间戳；
+2.  定义方法getDatetime():将任意一个Unix时间戳转换为标准时间；
+3.  定义方法getUnixtime():将任意一个标准时间转化为Unix时间；
 
 
 
