@@ -827,8 +827,10 @@ class SecUtils {
    * @param {Number} [bits=256] the SHA-3 width
    * @return {Buffer}
    */
-  sha3 () {
-    return this.keccak
+  sha3 (a, bits) {
+    a = this.toBuffer(a)
+    if (!bits) bits = 256
+    return createKeccakHash('keccak' + bits).update(a).digest()
   }
 
   /**
