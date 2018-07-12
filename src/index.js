@@ -76,7 +76,6 @@ class SecUtils {
     this.BN = BN
     this.secp256k1 = secp256k1
     this.rlp = rlp
-    this.sha3 = ''
 
     this.date = ''
     this.CurrentUnixtime = ''
