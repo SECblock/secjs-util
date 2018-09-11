@@ -17,27 +17,6 @@ const fs = require('fs')
 const ec = new EC('secp256k1')
 const ntpPort = '123'
 
-// internal use
-function isHexString (value, length){
-  if (typeof (value) !== 'string' || !value.match(/^0x[0-9A-Fa-f]*$/)) {
-    return false
-  }
-  if (length && value.length !== 2 + 2 * length) { return false }
-  return true
-}
-
-// internal use
-function padToEven (value) {
-  let a = value 
-  if (typeof a !== 'string') {
-    throw new Error(`[secjs-util] while padding to even, value must be string, is currently ${typeof a}, while padToEven.`)
-  }
-  if (a.length % 2) {
-    a = `0${a}`
-  }
-  return a
-}
-
 class SecUtils {
   constructor (config = { timeServer: 'DE' }) {
     /**
@@ -481,8 +460,8 @@ class SecUtils {
       if (Array.isArray(v)) {
         v = Buffer.from(v)
       } else if (typeof v === 'string') {
-        if (isHexString(v)) {
-          v = Buffer.from(padToEven(stripHexPrefix(v)), 'hex')
+        if (this.isHexString(v)) {
+          v = Buffer.from(this.padToEven(stripHexPrefix(v)), 'hex')
         } else {
           v = Buffer.from(v)
         }
