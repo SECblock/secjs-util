@@ -1085,3 +1085,17 @@ describe('intToBuffer', () => {
     assert.equal(buf.toString('hex'), '01')
   })
 })
+
+describe('entropyToMnemonic', () => {
+  it('should tranlate 12 - 24 random english word', () => {
+    const string64 = '4400f53d8349b80fdae44082d7f9541e1dba2b003bcfec9d0d53781ca676651f'
+    assert.equal(util.entropyToMnemonic(string64), 'dune amateur exhaust alley oppose among high marine lizard save fence destroy sweet better abstract ketchup uncle trick feel usual skill depth nerve wine')
+  })
+})
+
+describe('mnemonicToEntropy', () => {
+  it('should tranlate 64 strings', () => {
+    const englishWord = 'dune amateur exhaust alley oppose among high marine lizard save fence destroy sweet better abstract ketchup uncle trick feel usual skill depth nerve wine'
+    assert.equal(util.mnemonicToEntropy(englishWord), '4400f53d8349b80fdae44082d7f9541e1dba2b003bcfec9d0d53781ca676651f')
+  })
+})

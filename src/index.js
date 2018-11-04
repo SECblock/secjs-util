@@ -14,6 +14,7 @@ const RIPEMD160 = require('ripemd160')
 const bs58 = require('bs58')
 const dgram = require('dgram')
 const fs = require('fs')
+const bip39 = require('bip39')
 const ec = new EC('secp256k1')
 const ntpPort = '123'
 
@@ -1166,6 +1167,13 @@ class SecUtils {
       return str
     }
     return isHexPrefixed(str) ? str.slice(2) : str
+  }
+  entropyToMnemonic (seed) {
+    return bip39.entropyToMnemonic(seed)
+  }
+
+  mnemonicToEntropy (word) {
+    return bip39.mnemonicToEntropy(word)
   }
 }
 
