@@ -487,6 +487,12 @@ exports.defineProperties = function (self, fields, data) {
   }
 }
 
+exports.generatePrivateKey = function () {
+  let key = ec.genKeyPair()
+  let privKey = key.getPrivate().toString('hex')
+  return privKey
+}
+
 /**
  * Returns the SEC address of a given private key
  * @param {Buffer} privateKey A private key must be 256 bits wide
