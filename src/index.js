@@ -486,11 +486,22 @@ exports.defineProperties = function (self, fields, data) {
     }
   }
 }
-
+/**
+ * generate 256 bits private key
+ * return string
+ */
 exports.generatePrivateKey = function () {
   let key = ec.genKeyPair()
   let privKey = key.getPrivate().toString('hex')
   return privKey
+}
+/**
+ * translate private key to buffer for generation public key and address
+ * @param  {String} privString
+ * return buffer
+ */
+exports.privateToBuffer = function (privString) {
+  return Buffer.from(privString, 'hex')
 }
 
 /**
