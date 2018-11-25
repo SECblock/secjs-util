@@ -188,13 +188,13 @@ function _writeTimeDiffToFile (timeDiff) {
 /**
  * get the time difference
  */
-async function refreshTimeDifference (ntpTryOut, callback) {
+async function refreshTimeDifference (ntpTimeServerAddress, ntpTryOut, callback) {
   let localHostTime = exports.currentUnixTimeSecond()
   let serverTime = 0
   let tryOut = 0
   let timeDiff = 0
   try {
-    serverTime = await exports.asyncGetUTCTimeFromServer()
+    serverTime = await exports.asyncGetUTCTimeFromServer(ntpTimeServerAddress)
     timeDiff = localHostTime - serverTime
     _writeTimeDiffToFile()
     callback(null, timeDiff)
@@ -204,7 +204,7 @@ async function refreshTimeDifference (ntpTryOut, callback) {
       callback(serverTime, err)
       throw Error(err)
     }
-    serverTime = await exports.asyncGetUTCTimeFromServer()
+    serverTime = await exports.asyncGetUTCTimeFromServer(ntpTimeServerAddress)
     timeDiff = localHostTime - serverTime
     _writeTimeDiffToFile()
     callback(null, timeDiff)
