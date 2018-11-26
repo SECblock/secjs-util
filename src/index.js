@@ -554,6 +554,23 @@ exports.importPublic = function (publicKey) {
   return publicKey
 }
 
+exports.generateSecKeys = function () {
+  let key = ec.genKeyPair()
+  let privKey = key.getPrivate().toString('hex')
+
+  let privKeyBuffer = Buffer.from(privKey, 'hex')
+  let publicKeyBuffer = exports.privateToPublic(privKeyBuffer)
+  let addressBuffer = exports.publicToAddress(publicKeyBuffer)
+
+  let publicKey = publicKeyBuffer.toString('hex')
+  let address = addressBuffer.toString('hex')
+  return {
+    privKey: privKey,
+    publicKey: publicKey,
+    secAddress: address
+  }
+}
+
 /**
  * ECDSA sign
  * @param {Buffer} msgHash
