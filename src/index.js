@@ -492,8 +492,9 @@ exports.defineProperties = function (self, fields, data) {
  * return string
  */
 exports.generatePrivateKey = function () {
-  let key = ec.genKeyPair()
-  let privKey = key.getPrivate().toString('hex')
+  // let key = ec.genKeyPair()
+  // let privKey = key.getPrivate().toString('hex')
+  let privKey = crypto.randomBytes(32).toString('hex')
   return privKey
 }
 
