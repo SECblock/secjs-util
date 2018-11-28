@@ -557,9 +557,9 @@ exports.importPublic = function (publicKey) {
 }
 
 exports.generateSecKeys = function () {
-  let key = ec.genKeyPair()
-  let privKey = key.getPrivate().toString('hex')
-
+  // let key = ec.genKeyPair()
+  // let privKey = key.getPrivate().toString('hex')
+  let privKey = crypto.randomBytes(32).toString('hex')
   let privKeyBuffer = Buffer.from(privKey, 'hex')
   let publicKeyBuffer = exports.privateToPublic(privKeyBuffer)
   let addressBuffer = exports.publicToAddress(publicKeyBuffer)
