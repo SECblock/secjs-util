@@ -1,4 +1,3 @@
-
 const secp256k1 = require('secp256k1')
 const createKeccakHash = require('keccak')
 const createHash = require('create-hash')
